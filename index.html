@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee House</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('d.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: white;
+        }
+        header {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+        }
+        nav ul li {
+            position: relative;
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            font-size: 18px;
+        }
+        .dropdown {
+            display: none;
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.9);
+            list-style: none;
+            padding: 10px;
+            width: 250px;
+        }
+        nav ul li:hover .dropdown {
+            display: block;
+        }
+        .dropdown li {
+            padding: 5px;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 20px;
+        }
+        #order-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .customer-order {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Sami Coffee House</h1>
+        <nav>
+            <ul>
+                <li>
+                    <a href="#home">Home</a>
+                    <ul class="dropdown">
+                        <li><a href="#">Funny Movie 1</a></li>
+                        <li><a href="#">Funny Movie 2</a></li>
+                        <li><a href="#">Funny Movie 3</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#payment">Payment</a>
+                    <ul class="dropdown">
+                        <li>
+                            <label for="bank">Select Bank:</label>
+                            <select id="bank">
+                              <option value="tele birr">tele birr</option>
+                                <option value="CBE">Commercial Bank of Ethiopia</option>
+                                <option value="Awash">Awash Bank</option>
+                                <option value="Dashen">Dashen Bank</option>
+                                <option value="Abay">Abay Bank</option>
+                                <option value="Abyssinia">Bank of Abyssinia</option>
+                            </select>
+                        </li>
+                        <li><input type="text" id="accountNumber" placeholder="Enter Account Number"></li>
+                        <li><input type="text" id="amount" placeholder="Enter Amount (Birr)"></li>
+                        <li><button onclick="sendPayment()">Send</button></li>
+                    </ul>
+                </li>
+                <li><a href="#manager">Manager</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <section id="order">
+        <h2>Place Your Order</h2>
+        <form id="orderForm">
+            <label for="customer">Customer Name:</label>
+            <input type="text" id="customer" placeholder="Enter Customer Name">
+            <label for="menuItem">Select Menu Item:</label>
+            <select id="menuItem">
+                <option value="Sanbusa" data-price="25">Sanbusa - 25 Birr</option>
+                <option value="Tea" data-price="15">Tea - 15 Birr</option>
+                <option value="Coffee" data-price="20">Coffee - 20 Birr</option>
+                <option value="Makyato" data-price="30">Makyato - 30 Birr</option>
+                <option value="Milk" data-price="30">Milk - 30 Birr</option>
+                <option value="Kasher" data-price="20">Kasher - 20 Birr</option>
+                <option value="Spris" data-price="20">Spris - 20 Birr</option>
+            </select>
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" min="1" value="1">
+            <button type="button" onclick="submitOrder()">Place Order</button>
+        </form>
+    </section>
+    
+    <section id="order-list">
+        <h2>Ordered List</h2>
+        <div id="orderedList"></div>
+    </section>
+    
+    <script>
+        let orders = {};
+
+        function submitOrder() {
+            let customer = document.getElementById("customer").value || `Customer${Object.keys(orders).length + 1}`;
+            let menuItem = document.getElementById("menuItem");
+            let itemName = menuItem.value;
+            let itemPrice = parseInt(menuItem.options[menuItem.selectedIndex].getAttribute("data-price"));
+            let quantity = parseInt(document.getElementById("quantity").value);
+            let totalCost = itemPrice * quantity;
+            
+            if (!orders[customer]) {
+                orders[customer] = [];
+            }
+            orders[customer].push({ item: itemName, quantity: quantity, cost: totalCost });
+            
+            updateOrderedList();
+        }
+
+        function updateOrderedList() {
+            let orderList = document.getElementById("orderedList");
+            orderList.innerHTML = "";
+            
+            Object.keys(orders).forEach(customer => {
+                let customerOrders = orders[customer];
+                let total = customerOrders.reduce((sum, order) => sum + order.cost, 0);
+                
+                let div = document.createElement("div");
+                div.className = "customer-order";
+                div.innerHTML = `<strong>${customer}:</strong> ` + customerOrders.map(order => `${order.item} x${order.quantity}`).join(", ") + ` <strong>Total: ${total} Birr</strong>`;
+                orderList.appendChild(div);
+            });
+        }
+
+        function sendPayment() {
+            let bank = document.getElementById("bank").value;
+            let accountNumber = document.getElementById("accountNumber").value;
+            let amount = document.getElementById("amount").value;
+            alert(`Payment of ${amount} Birr sent to ${bank} account ${accountNumber}!`);
+        }
+    </script>
+    
+    <footer>
+        <p>"At Sami Coffee House, we take pride in serving high-quality coffee and delicious treats. Whether you're here for a quick coffee break or a relaxing time with friends, we’re here to make every sip special."</p>
+    </footer>
+</body>
+</html>
